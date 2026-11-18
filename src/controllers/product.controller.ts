@@ -1,9 +1,10 @@
 import type { IncomingMessage, ServerResponse } from "http";
-import { productService } from "../service/product.service";
+import { createProduct, productService } from "../service/product.service";
 import type { IProduct } from "../types/product";
+import { bodyParser } from "../utils/parseBody";
 
 
-const productController = (req : IncomingMessage, res : ServerResponse )=>{
+const productController = async (req : IncomingMessage, res : ServerResponse )=>{
     //products -> GEt, POST, PUT
 const url = req.url;
 const method = req.method
@@ -51,7 +52,33 @@ const products = productService();
         )
  }
 
+else if (method === "POST" && url === "/products"){
+    const body = await bodyParser(req);
+    //console.log(body)
+    const newProduct = {
+        id : Date.now(),
+        ...body
+    }
+    //console.log(newProduct);
 
+
+     const products = productService(); // [{},{}]
+ products.push(newProduct);//[{},{},{new}]
+
+ createProduct(products);
+
+
+
+
+ res.writeHead(201,{"Content-type" : "application/json"});
+            res.end(JSON.stringify({message:" Product created successfully",
+                data : newProduct,
+            }),
+        ) 
 };
+    
+}
+
+
 
 export default productController;
