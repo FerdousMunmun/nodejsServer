@@ -10,6 +10,12 @@ export const bodyParser =(req : IncomingMessage) : Promise<any> => {
         });
        req.on("end", ()=>{
         try {
+
+             // Check if request body is empty
+        if (!body.trim()) {
+          resolve({});
+          return;
+        }
             resolve(JSON.parse(body));
         }
         catch (error){
